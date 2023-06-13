@@ -11,7 +11,7 @@ def basic_request(url, headers, save_fpath):
     print(result.json())
     print(result.cookies)
     with open(save_fpath, "w") as file:
-        file.write(json.dumps(result.json()[0]))
+        file.write(json.dumps(result.json()))
 
 def construct_url(template_url, start, end, currencies):
     test_url_parsed = urlparse(template_url)
