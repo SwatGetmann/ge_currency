@@ -1,3 +1,5 @@
+import argparse
+import datetime
 import requests
 import json
 
@@ -34,15 +36,31 @@ def construct_url(template_url, start, end, currencies):
 
     return test_url_parsed._replace(query=test_qs).geturl()
 
+parser = argparse.ArgumentParser(description='Georgian currency API reader.')
+parser.add_argument('--start_dt', 
+                    type=lambda d: datetime.datetime.strptime(d, "%Y-%m-%d"),
+                    default=datetime.datetime.now(),
+                    help='a start date for curerncy to be read'
+)
+parser.add_argument('--end_dt', 
+                    type=lambda d: datetime.datetime.strptime(d, "%Y-%m-%d"),  
+                    default=datetime.datetime.now(),
+                    help='an end date for curerncy to be read'
+)
+
+
 if __name__ == '__main__':
+    args = parser.parse_args()
+    print(args)
+    
     print("Test")
     
     test_url = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/?currencies=USD&currencies=USD&end=2023-06-13T04%3A37%3A39.818Z&start=2023-05-24T04%3A37%3A39.818Z"
     
     test_url_v2 = construct_url(
         template_url=test_url,
-        start='2023-05-01',
-        end='2023-05-31',
+        start=args.start_dt.strftime('%F'),
+        end=args.end_dt.strftime('%F'),
         currencies='USD'
     )
     
