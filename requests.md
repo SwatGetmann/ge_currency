@@ -37,3 +37,77 @@ Invoke-WebRequest -UseBasicParsing -Uri "https://nbg.gov.ge/gw/api/ct/monetarypo
   "Cache-Control" = "no-cache"
 }
 ```
+
+
+# TBC Requests
+
+## Posix Windows CURL
+```
+curl 'https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage' -X POST -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.tbcbank.ge' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://www.tbcbank.ge/web/en/exchange-rates' -H 'Cookie: JSESSIONID=PUAWZqMWuoq2q3ICpiF6MhBQ; TS01987dc4=01863392edc20fb0183a36fe7e153ef41e2990d2da54ce831f58d73fa1f3000b23b0c0a1d9ea2717bb9d24b5350d3328cbc8e6e643; cc_cookie={"level": ["necessary","analytics","preferences", "targeting"]}; TS01441710=01863392ed9759d4b5c07869566c5174aca9021a4a0d8fdf55ef158029bd549bca2856b7add966d0f221dd96133a2575d5a7764f4e' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Sec-GPC: 1' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: trailers' --data-raw 'currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=1&chartCalendarValue=&useCalendar=false'
+```
+## PowerShell CURL
+```
+$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$session.Cookies.Add((New-Object System.Net.Cookie("JSESSIONID", "PUAWZqMWuoq2q3ICpiF6MhBQ", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("TS01987dc4", "01863392edc20fb0183a36fe7e153ef41e2990d2da54ce831f58d73fa1f3000b23b0c0a1d9ea2717bb9d24b5350d3328cbc8e6e643", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("cc_cookie", "{`"level`": [`"necessary`",`"analytics`",`"preferences`", `"targeting`"]}", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("TS01441710", "01863392ed9759d4b5c07869566c5174aca9021a4a0d8fdf55ef158029bd549bca2856b7add966d0f221dd96133a2575d5a7764f4e", "/", "www.tbcbank.ge")))
+Invoke-WebRequest -UseBasicParsing -Uri "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage" `
+-Method POST `
+-WebSession $session `
+-UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0" `
+-Headers @{
+"Accept" = "*/*"
+  "Accept-Language" = "en-US,en;q=0.5"
+  "Accept-Encoding" = "gzip, deflate, br"
+  "X-Requested-With" = "XMLHttpRequest"
+  "Origin" = "https://www.tbcbank.ge"
+  "DNT" = "1"
+  "Referer" = "https://www.tbcbank.ge/web/en/exchange-rates"
+  "Sec-Fetch-Dest" = "empty"
+  "Sec-Fetch-Mode" = "cors"
+  "Sec-Fetch-Site" = "same-origin"
+  "Sec-GPC" = "1"
+  "Pragma" = "no-cache"
+  "Cache-Control" = "no-cache"
+  "TE" = "trailers"
+} `
+-ContentType "application/x-www-form-urlencoded; charset=UTF-8" `
+-Body "currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=1&chartCalendarValue=&useCalendar=false"
+```
+
+## POSIX - 2
+```
+curl 'https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage' -X POST -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.tbcbank.ge' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://www.tbcbank.ge/web/en/exchange-rates' -H 'Cookie: JSESSIONID=PUAWZqMWuoq2q3ICpiF6MhBQ; TS01987dc4=01863392edc20fb0183a36fe7e153ef41e2990d2da54ce831f58d73fa1f3000b23b0c0a1d9ea2717bb9d24b5350d3328cbc8e6e643; cc_cookie={"level": ["necessary","analytics","preferences", "targeting"]}; TS01441710=01863392edb28355618613d614f5468da4686c59b22cdf481959b8476b006c6270868c40e9665c08d11cba89e834200bafbb030123' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Sec-GPC: 1' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: trailers' --data-raw 'currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=3&chartCalendarValue=4%2F1%2F2023&useCalendar=true'
+```
+
+### Power Shell - 2
+```
+$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$session.Cookies.Add((New-Object System.Net.Cookie("JSESSIONID", "PUAWZqMWuoq2q3ICpiF6MhBQ", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("TS01987dc4", "01863392edc20fb0183a36fe7e153ef41e2990d2da54ce831f58d73fa1f3000b23b0c0a1d9ea2717bb9d24b5350d3328cbc8e6e643", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("cc_cookie", "{`"level`": [`"necessary`",`"analytics`",`"preferences`", `"targeting`"]}", "/", "www.tbcbank.ge")))
+$session.Cookies.Add((New-Object System.Net.Cookie("TS01441710", "01863392edb28355618613d614f5468da4686c59b22cdf481959b8476b006c6270868c40e9665c08d11cba89e834200bafbb030123", "/", "www.tbcbank.ge")))
+Invoke-WebRequest -UseBasicParsing -Uri "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage" `
+-Method POST `
+-WebSession $session `
+-UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0" `
+-Headers @{
+"Accept" = "*/*"
+  "Accept-Language" = "en-US,en;q=0.5"
+  "Accept-Encoding" = "gzip, deflate, br"
+  "X-Requested-With" = "XMLHttpRequest"
+  "Origin" = "https://www.tbcbank.ge"
+  "DNT" = "1"
+  "Referer" = "https://www.tbcbank.ge/web/en/exchange-rates"
+  "Sec-Fetch-Dest" = "empty"
+  "Sec-Fetch-Mode" = "cors"
+  "Sec-Fetch-Site" = "same-origin"
+  "Sec-GPC" = "1"
+  "Pragma" = "no-cache"
+  "Cache-Control" = "no-cache"
+  "TE" = "trailers"
+} `
+-ContentType "application/x-www-form-urlencoded; charset=UTF-8" `
+-Body "currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=3&chartCalendarValue=4%2F1%2F2023&useCalendar=true"
+```
