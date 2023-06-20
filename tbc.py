@@ -8,16 +8,13 @@ from urllib.parse import urlparse, parse_qs, urlencode
 def basic_request(url, data, headers, save_fpath):
     result = requests.post(url, data=data, headers=headers)  
     print(result.status_code)
-    print(result.json())
     print(result.cookies)
     with open(save_fpath, "w") as file:
-        file.write(json.dumps(result.json()))
+        file.write(result.text)
 
 def construct_body(template, chart_calendar_value, currencies, filter_combo):
-    test_url_parsed = urlparse(template)
-    print(test_url_parsed)
-    
-    test_qdict = parse_qs(test_url_parsed.query)
+    print(template)
+    test_qdict = parse_qs(template)
     
     print(test_qdict)
     
@@ -41,14 +38,15 @@ if __name__ == '__main__':
     
     test_body = "currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=3&chartCalendarValue=4%2F1%2F2023&useCalendar=true"
     
-    test_url_v2 = construct_body(
+    test_data = construct_body(
         template=test_body,
-        chart_calendar_value=datetime.datetime(year=2023, month=6, day=1).strftime('%F'),
+        chart_calendar_value=datetime.datetime(year=2023, month=6, day=1).strftime('%m/%d/%Y'),
         currencies="USD:true,EUR:false,GBP:false",
         filter_combo='3',
     )
     
     headers = {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         "Accept-Language": "en-US,en;q=0.5",
         "Accept-Encoding": "gzip, deflate, br",
         "X-Requested-With": "XMLHttpRequest",
@@ -64,8 +62,12 @@ if __name__ == '__main__':
         "TE": "trailers"
     }
     
-    # basic_request(
-    #     url=test_url_v2,
-    #     headers=headers,
-    #     save_fpath='./results/tbc_test_01.json'
-    # )
+    basic_request(
+        url=test_url,
+        data=test_data,
+        headers=headers,
+        save_fpath='./results/tbc_test_01.html'
+    )
+    
+    # TODO: parse
+    # var chartData = "[{date:'May 29, 2023',USD:2.5876},{date:'May 30, 2023',USD:2.5823},{date:'May 31, 2023',USD:2.5919},{date:'Jun 1, 2023',USD:2.5972},{date:'Jun 2, 2023',USD:2.6396},{date:'Jun 3, 2023',USD:2.6335},{date:'Jun 4, 2023',USD:2.6335}]";
