@@ -3,11 +3,15 @@ import datetime
 import requests
 import json
 import re
-
 import pathlib
-from math import ceil
 
+from math import ceil
 from urllib.parse import urlparse, parse_qs, urlencode
+
+from exceptions import *
+from validations import *
+
+from tbc_tests import *
 
 def basic_request(url, data, headers, save_fpath):
     result = requests.post(url, data=data, headers=headers)  
@@ -16,40 +20,6 @@ def basic_request(url, data, headers, save_fpath):
     with open(save_fpath, "w") as file:
         file.write(result.text)
     return result
-
-def validate_request(request):
-    if request.status_code != 200:
-        raise InvalidResponseCode(request.status_code)
-
-def validate_content(content):
-    if content == '':
-        raise EmptyContent()
-
-def validate_match(match):
-    if match is None:
-        raise MatchNotFound()
-
-class InvalidResponseCode(BaseException):
-    def __init__(self, code, message="Response Code is not successful (200)") -> None:
-        self.code = code
-        self.message = message
-        super().__init__(self.message)
-    
-class EmptyContent(BaseException):
-    def __init__(self, message="Content is empty") -> None:
-        self.message = message
-        super().__init__(self.message)
-
-class MatchNotFound(BaseException):
-    def __init__(self, message="Match for Response Content had not been found") -> None:
-        self.message = message
-        super().__init__(self.message)
-
-class NotProvidedParameter(BaseException):
-    def __init__(self, parameter_name='ParameterName', message=" is not provided!") -> None:
-        self.parameter_name = parameter_name
-        self.message = self.parameter_name + message
-        super().__init__(self.message)
 
 
 def currency_codes_body_str(currencies):
@@ -219,69 +189,7 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 
 if __name__ == '__main__':
     print("TBC Test")
-    
-    # TEST 1 - Old Date, Single Currency
-    # res = crawl(
-    #     save_fpath='./results/tbc_test_04A.html',
-    #     start_dt=datetime.datetime(year=2022, month=7, day=1)
-    # )
-    # validate_request(res)
-    # validate_content(res.text)
-    # currency_values = parse(res.text)
-    
-    # # TEST 2 - Old Date, 2 Currencies
-    # # des = desired
-    # des_currencies = ['USD', 'EUR']                                             
-    # res = crawl(
-    #     save_fpath='./results/tbc_test_04B.html', 
-    #     start_dt=datetime.datetime(year=2022, month=12, day=11),
-    #     currencies=des_currencies
-    # )
-    # validate_request(res)
-    # validate_content(res.text)
-    # currency_values = parse(res.text, currencies=des_currencies)
-    
-    # # TEST 3 - Parse from Read
-    # # Read Previously collected file to parse
-    # content = read_saved_result('./results/tbc_test_01.html')
-    # validate_content(content)
-    # des_currencies = ['USD']
-    # currency_values = parse(content)
-    
-    # TEST 4 - FAIL STATE - Generates a NotProvidedParameter exception
-    # Destined to fail
-    # des = desired
-    # des_currencies = []                                             
-    # res = crawl(
-    #     save_fpath='./results/tbc_test_04B.html', 
-    #     start_dt=datetime.datetime(year=2023, month=5, day=1),
-    #     currencies=des_currencies
-    # )
-    # validate_request(res)
-    # validate_content(res.text)
-    # currency_values = parse(res.text, currencies=des_currencies)
-    
-    # TEST 5 - Paginated crawl - Last 1 Week
-    start_dt = datetime.datetime.now()
-    end_dt = start_dt - datetime.timedelta(days=25)
-    
-    paginated_crawl(
-        save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
-        marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
-        start_dt=start_dt,
-        end_dt=end_dt, 
-        currencies=['USD']
-    )
-    
-    # TEST 6 - Paginated crawl - Arbitrary Dates
-    # start_dt = datetime.datetime(year=2023, month=5, day=1)
-    # end_dt = start_dt - datetime.timedelta(days=30)
-    
-    # paginated_crawl(
-    #     save_fpath_prefix='./results/TBC_TEST5_Month', 
-    #     marker_fpath='./markers/TBC_TEST5_Month.marker', 
-    #     start_dt=start_dt,
-    #     end_dt=end_dt, 
-    #     currencies=['USD']
-    # )
+
+    test_4()    
+    # test_5()
     
