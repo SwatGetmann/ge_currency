@@ -42,37 +42,50 @@ class MatchNotFound(BaseException):
         self.message = message
         super().__init__(self.message)
 
-def construct_body(template, chart_calendar_value, currencies, filter_combo):
-    print(template)
-    test_qdict = parse_qs(template)
-    
-    print(test_qdict)
-    
-    test_qdict['chartCalendarValue'] = chart_calendar_value
-    test_qdict['useCalendar'] = 'true'
-    test_qdict['currencyCodes'] = currencies
-    test_qdict['filterCombo'] = filter_combo
-    
-    print(test_qdict)
-    
-    test_qs = urlencode(test_qdict)
-    
-    print(test_qs)
-    
-    return test_qs    
+class NotProvidedCurrencies(BaseException):
+    def __init__(self, message="Currencies Parameter is not provided!") -> None:
+        self.message = message
+        super().__init__(self.message)
+        
+class NotProvidedStartDatetime(BaseException):
+    def __init__(self, message="Start DT / chartCalendarValue Parameter is not provided!") -> None:
+        self.message = message
+        super().__init__(self.message)
 
-def crawl(save_fpath, start_dt):
+
+def currency_codes_body_str(currencies):
+    map = {
+        'USD': False,
+        'EUR': False,
+        'GBP': False,
+    }
+    keys = map.keys()
+    
+    for currency in currencies:
+        if currency in keys:
+            map[currency] = True
+    
+    return ",".join(["{}:{}".format(i[0], str.lower(str(i[1]))) for i in map.items()])    
+
+
+def crawl(save_fpath, start_dt, currencies=['USD'], filter_combo=3):
     url = "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage"
     
-    body_template = "currencyCodes=USD%3Atrue%2CEUR%3Atrue%2CGBP%3Atrue&filterCombo=3&chartCalendarValue=4%2F1%2F2023&useCalendar=true"
+    if currencies is None or not currencies:
+        raise NotProvidedCurrencies()
     
-    body = construct_body(
-        template=body_template,
-        chart_calendar_value=start_dt.strftime('%m/%d/%Y'),
-        currencies="USD:true,EUR:false,GBP:false",
-        filter_combo='1',
-    )
+    if not start_dt:
+        raise NotProvidedStartDatetime()
     
+    body_dict = {
+        'currencyCodes': currency_codes_body_str(currencies),
+        'filterCombo': str(filter_combo),
+        'chartCalendarValue': start_dt.strftime('%m/%d/%Y'),
+        'useCalendar': str.lower(str(True)),
+    }
+    
+    body = urlencode(body_dict)
+        
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         "Accept-Language": "en-US,en;q=0.5",
@@ -99,7 +112,8 @@ def crawl(save_fpath, start_dt):
     
     return res
 
-def parse(content):
+
+def parse(content, currencies=['USD']):
     match = re.search('\n\s+var chartData = \"(.*)\";', content)
     validate_match(match)
     
@@ -109,8 +123,14 @@ def parse(content):
     chart_data_text = match.group(1)
     chart_data_text, _ = re.subn('date:', '"date":', chart_data_text)
     print(chart_data_text)
-    chart_data_text, _ = re.subn('USD:', '"USD":', chart_data_text)
-    print(chart_data_text)
+    
+    for currency in currencies:        
+        chart_data_text, _ = re.subn(
+            '{}:'.format(currency), 
+            '"{}":'.format(currency),
+            chart_data_text
+        )
+        print(chart_data_text)
 
     currency_values = eval(chart_data_text)
     print(currency_values)
@@ -118,6 +138,7 @@ def parse(content):
     print(len(currency_values))
     
     return currency_values
+
 
 def read_saved_result(read_fpath):
     read_fpath = './results/tbc_test_01.html'
@@ -128,19 +149,32 @@ def read_saved_result(read_fpath):
     print(len(content))
     return content
 
+
 if __name__ == '__main__':
     print("TBC Test")
     
     res = crawl(
-        save_fpath='./results/tbc_test_03c.html', 
+        save_fpath='./results/tbc_test_04A.html', 
         start_dt=datetime.datetime(year=2022, month=7, day=1)
     )
     validate_request(res)
     validate_content(res.text)
     currency_values = parse(res.text)
     
+    # des = desired
+    des_currencies = ['USD', 'EUR']                                             
+    res = crawl(
+        save_fpath='./results/tbc_test_04B.html', 
+        start_dt=datetime.datetime(year=2022, month=12, day=11),
+        currencies=des_currencies
+    )
+    validate_request(res)
+    validate_content(res.text)
+    currency_values = parse(res.text, currencies=des_currencies)
+    
     # Read Previously collected file to parse
     content = read_saved_result('./results/tbc_test_01.html')
     validate_content(content)
+    des_currencies = ['USD']
     currency_values = parse(content)
     
