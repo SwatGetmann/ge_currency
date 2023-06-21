@@ -2,3 +2,4 @@ env/
 results/
 markers/
 *.code-workspace
+__pycache__/
