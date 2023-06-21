@@ -42,14 +42,10 @@ class MatchNotFound(BaseException):
         self.message = message
         super().__init__(self.message)
 
-class NotProvidedCurrencies(BaseException):
-    def __init__(self, message="Currencies Parameter is not provided!") -> None:
-        self.message = message
-        super().__init__(self.message)
-        
-class NotProvidedStartDatetime(BaseException):
-    def __init__(self, message="Start DT / chartCalendarValue Parameter is not provided!") -> None:
-        self.message = message
+class NotProvidedParameter(BaseException):
+    def __init__(self, parameter_name='ParameterName', message=" is not provided!") -> None:
+        self.parameter_name = parameter_name
+        self.message = self.parameter_name + message
         super().__init__(self.message)
 
 
@@ -72,10 +68,10 @@ def crawl(save_fpath, start_dt, currencies=['USD'], filter_combo=3):
     url = "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage"
     
     if currencies is None or not currencies:
-        raise NotProvidedCurrencies()
+        raise NotProvidedParameter(parameter_name='currencies')
     
     if not start_dt:
-        raise NotProvidedStartDatetime()
+        raise NotProvidedParameter(parameter_name='Start DT || chartCalendarValue')
     
     body_dict = {
         'currencyCodes': currency_codes_body_str(currencies),
@@ -178,3 +174,15 @@ if __name__ == '__main__':
     des_currencies = ['USD']
     currency_values = parse(content)
     
+    
+    # Destined to fail
+    # des = desired
+    des_currencies = []                                             
+    res = crawl(
+        save_fpath='./results/tbc_test_04B.html', 
+        start_dt=datetime.datetime(year=2023, month=5, day=1),
+        currencies=des_currencies
+    )
+    validate_request(res)
+    validate_content(res.text)
+    currency_values = parse(res.text, currencies=des_currencies)
