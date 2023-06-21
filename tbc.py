@@ -176,7 +176,7 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     delta_days = ceil((start_dt - end_dt) / datetime.timedelta(days=1))
     
     if first_day_today:
-        pages = 1 + int((delta_days - 7) // 7)
+        pages = 1 + int((delta_days - 10) // 7)
     else:
         pages = int(delta_days // 7)
     
@@ -200,7 +200,7 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     for i in range(0, pages+1):
         t_day_delta = 7*i
         if first_day_today:
-            t_day_delta -= (i > 1) * 7
+            t_day_delta += (i > 0) * 4
             
         t_start_dt = start_dt - datetime.timedelta(days=t_day_delta)
         
@@ -262,16 +262,16 @@ if __name__ == '__main__':
     # currency_values = parse(res.text, currencies=des_currencies)
     
     # TEST 5 - Paginated crawl - Last 1 Week
-    # start_dt = datetime.datetime.now()
-    # end_dt = start_dt - datetime.timedelta(days=25)
+    start_dt = datetime.datetime.now()
+    end_dt = start_dt - datetime.timedelta(days=25)
     
-    # paginated_crawl(
-    #     save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
-    #     marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
-    #     start_dt=start_dt,
-    #     end_dt=end_dt, 
-    #     currencies=['USD']
-    # )
+    paginated_crawl(
+        save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
+        marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
+        start_dt=start_dt,
+        end_dt=end_dt, 
+        currencies=['USD']
+    )
     
     # TEST 6 - Paginated crawl - Arbitrary Dates
     # start_dt = datetime.datetime(year=2023, month=5, day=1)
