@@ -159,13 +159,26 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     if not end_dt:
         raise NotProvidedParameter(parameter_name='End DT')
     
+    print("Paginated crawl for {} - {}".format(end_dt, start_dt))
+    
     # precalulcate how many requests are necessary
     # we know that TBC gives the desired date in the middle of response list
     # so [-3, -2, -1, 0 = cur date, +1, +2, +3]
     # based on that, we can go back only for 3 days witihn one request
     
+    first_day_today = False
+    
+    if start_dt.date() == datetime.date.today():
+        # first page gives last 7 days already
+        # next ones should be done with -3 offset
+        first_day_today = True
+
     delta_days = ceil((start_dt - end_dt) / datetime.timedelta(days=1))
-    pages = int(delta_days // 3)
+    
+    if first_day_today:
+        pages = 1 + int((delta_days - 7) // 7)
+    else:
+        pages = int(delta_days // 7)
     
     print("Delta Days : {} /// Pages to go back: {}".format(delta_days, pages))
     
@@ -176,16 +189,26 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         f.write(
             json.dumps({
                 'save_fpath_prefix': save_fpath_prefix,
-                'pages': pages
+                'pages': pages,
+                'first_day_today': first_day_today,
             })
         )
     
     print("Marker is written to {}".format(marker_fpath))
     
+    t_day_delta = 0
     for i in range(0, pages+1):
+        t_day_delta = 7*i
+        if first_day_today:
+            t_day_delta -= (i > 1) * 7
+            
+        t_start_dt = start_dt - datetime.timedelta(days=t_day_delta)
+        
+        print(t_start_dt)
+        
         crawl(
             save_fpath="{}_p{:03}.html".format(save_fpath_prefix, i), 
-            start_dt=start_dt - datetime.timedelta(days=3*i),
+            start_dt=t_start_dt,
             currencies=currencies
         ) 
 
@@ -240,7 +263,7 @@ if __name__ == '__main__':
     
     # TEST 5 - Paginated crawl - Last 1 Week
     # start_dt = datetime.datetime.now()
-    # end_dt = start_dt - datetime.timedelta(days=7)
+    # end_dt = start_dt - datetime.timedelta(days=25)
     
     # paginated_crawl(
     #     save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
@@ -250,15 +273,15 @@ if __name__ == '__main__':
     #     currencies=['USD']
     # )
     
-    # TEST ^ - Paginated crawl - Arbitrary Dates
-    start_dt = datetime.datetime(year=2023, month=5, day=1)
-    end_dt = start_dt - datetime.timedelta(days=30)
+    # TEST 6 - Paginated crawl - Arbitrary Dates
+    # start_dt = datetime.datetime(year=2023, month=5, day=1)
+    # end_dt = start_dt - datetime.timedelta(days=30)
     
-    paginated_crawl(
-        save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
-        marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
-        start_dt=start_dt,
-        end_dt=end_dt, 
-        currencies=['USD']
-    )
+    # paginated_crawl(
+    #     save_fpath_prefix='./results/TBC_TEST5_Month', 
+    #     marker_fpath='./markers/TBC_TEST5_Month.marker', 
+    #     start_dt=start_dt,
+    #     end_dt=end_dt, 
+    #     currencies=['USD']
+    # )
     
