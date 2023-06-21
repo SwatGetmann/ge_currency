@@ -4,6 +4,9 @@ import requests
 import json
 import re
 
+import pathlib
+from math import ceil
+
 from urllib.parse import urlparse, parse_qs, urlencode
 
 def basic_request(url, data, headers, save_fpath):
@@ -64,7 +67,7 @@ def currency_codes_body_str(currencies):
     return ",".join(["{}:{}".format(i[0], str.lower(str(i[1]))) for i in map.items()])    
 
 
-def crawl(save_fpath, start_dt, currencies=['USD'], filter_combo=3):
+def crawl(save_fpath, start_dt, currencies=['USD']):
     url = "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage"
     
     if currencies is None or not currencies:
@@ -75,7 +78,7 @@ def crawl(save_fpath, start_dt, currencies=['USD'], filter_combo=3):
     
     body_dict = {
         'currencyCodes': currency_codes_body_str(currencies),
-        'filterCombo': str(filter_combo),
+        'filterCombo': str(3), # don't know but let's hard code for now
         'chartCalendarValue': start_dt.strftime('%m/%d/%Y'),
         'useCalendar': str.lower(str(True)),
     }
@@ -146,43 +149,116 @@ def read_saved_result(read_fpath):
     return content
 
 
+def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):    
+    if currencies is None or not currencies:
+        raise NotProvidedParameter(parameter_name='currencies')
+    
+    if not start_dt:
+        raise NotProvidedParameter(parameter_name='Start DT || chartCalendarValue')
+    
+    if not end_dt:
+        raise NotProvidedParameter(parameter_name='End DT')
+    
+    # precalulcate how many requests are necessary
+    # we know that TBC gives the desired date in the middle of response list
+    # so [-3, -2, -1, 0 = cur date, +1, +2, +3]
+    # based on that, we can go back only for 3 days witihn one request
+    
+    delta_days = ceil((start_dt - end_dt) / datetime.timedelta(days=1))
+    pages = int(delta_days // 3)
+    
+    print("Delta Days : {} /// Pages to go back: {}".format(delta_days, pages))
+    
+    if not pathlib.Path(marker_fpath).exists():
+        pathlib.Path(marker_fpath).parents[0].mkdir(parents=True, exist_ok=True)
+    
+    with open(marker_fpath, 'w') as f:
+        f.write(
+            json.dumps({
+                'save_fpath_prefix': save_fpath_prefix,
+                'pages': pages
+            })
+        )
+    
+    print("Marker is written to {}".format(marker_fpath))
+    
+    for i in range(0, pages+1):
+        crawl(
+            save_fpath="{}_p{:03}.html".format(save_fpath_prefix, i), 
+            start_dt=start_dt - datetime.timedelta(days=3*i),
+            currencies=currencies
+        ) 
+
+
+# def paginated_parse():
+#     # TBD
+
+
 if __name__ == '__main__':
     print("TBC Test")
     
-    res = crawl(
-        save_fpath='./results/tbc_test_04A.html', 
-        start_dt=datetime.datetime(year=2022, month=7, day=1)
-    )
-    validate_request(res)
-    validate_content(res.text)
-    currency_values = parse(res.text)
+    # TEST 1 - Old Date, Single Currency
+    # res = crawl(
+    #     save_fpath='./results/tbc_test_04A.html',
+    #     start_dt=datetime.datetime(year=2022, month=7, day=1)
+    # )
+    # validate_request(res)
+    # validate_content(res.text)
+    # currency_values = parse(res.text)
     
-    # des = desired
-    des_currencies = ['USD', 'EUR']                                             
-    res = crawl(
-        save_fpath='./results/tbc_test_04B.html', 
-        start_dt=datetime.datetime(year=2022, month=12, day=11),
-        currencies=des_currencies
-    )
-    validate_request(res)
-    validate_content(res.text)
-    currency_values = parse(res.text, currencies=des_currencies)
+    # # TEST 2 - Old Date, 2 Currencies
+    # # des = desired
+    # des_currencies = ['USD', 'EUR']                                             
+    # res = crawl(
+    #     save_fpath='./results/tbc_test_04B.html', 
+    #     start_dt=datetime.datetime(year=2022, month=12, day=11),
+    #     currencies=des_currencies
+    # )
+    # validate_request(res)
+    # validate_content(res.text)
+    # currency_values = parse(res.text, currencies=des_currencies)
     
-    # Read Previously collected file to parse
-    content = read_saved_result('./results/tbc_test_01.html')
-    validate_content(content)
-    des_currencies = ['USD']
-    currency_values = parse(content)
+    # # TEST 3 - Parse from Read
+    # # Read Previously collected file to parse
+    # content = read_saved_result('./results/tbc_test_01.html')
+    # validate_content(content)
+    # des_currencies = ['USD']
+    # currency_values = parse(content)
     
-    
+    # TEST 4 - FAIL STATE - Generates a NotProvidedParameter exception
     # Destined to fail
     # des = desired
-    des_currencies = []                                             
-    res = crawl(
-        save_fpath='./results/tbc_test_04B.html', 
-        start_dt=datetime.datetime(year=2023, month=5, day=1),
-        currencies=des_currencies
+    # des_currencies = []                                             
+    # res = crawl(
+    #     save_fpath='./results/tbc_test_04B.html', 
+    #     start_dt=datetime.datetime(year=2023, month=5, day=1),
+    #     currencies=des_currencies
+    # )
+    # validate_request(res)
+    # validate_content(res.text)
+    # currency_values = parse(res.text, currencies=des_currencies)
+    
+    # TEST 5 - Paginated crawl - Last 1 Week
+    # start_dt = datetime.datetime.now()
+    # end_dt = start_dt - datetime.timedelta(days=7)
+    
+    # paginated_crawl(
+    #     save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
+    #     marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
+    #     start_dt=start_dt,
+    #     end_dt=end_dt, 
+    #     currencies=['USD']
+    # )
+    
+    # TEST ^ - Paginated crawl - Arbitrary Dates
+    start_dt = datetime.datetime(year=2023, month=5, day=1)
+    end_dt = start_dt - datetime.timedelta(days=30)
+    
+    paginated_crawl(
+        save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
+        marker_fpath='./markers/TBC_TEST5_LastWeek.marker', 
+        start_dt=start_dt,
+        end_dt=end_dt, 
+        currencies=['USD']
     )
-    validate_request(res)
-    validate_content(res.text)
-    currency_values = parse(res.text, currencies=des_currencies)
+    
