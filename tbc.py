@@ -110,7 +110,6 @@ def parse(content, currencies=['USD']):
 
 
 def read_saved_result(read_fpath):
-    read_fpath = './results/tbc_test_01.html'
     content = None
     with open(read_fpath, "r") as file:
         content = file.read()
@@ -183,8 +182,8 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         ) 
 
 
-# def paginated_parse():
-#     # TBD
+def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):
+    pass
 
 
 if __name__ == '__main__':
