@@ -34,6 +34,14 @@ def test_3():
     des_currencies = ['USD']
     currency_values = parse(content)
     
+def test_3b():
+    # TEST 3 - Parse from Read - Multiple Currencies - FAILS now
+    # Read Previously collected file to parse
+    content = read_saved_result('./results/tbc_test_01.html')
+    validate_content(content)
+    des_currencies = ['USD', 'EUR']
+    currency_values = parse(content, currencies=des_currencies)
+    
 def test_4():
     # TEST 4 - FAIL STATE - Generates a NotProvidedParameter exception
     # Destined to fail

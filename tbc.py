@@ -176,14 +176,35 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         print(t_start_dt)
         
         crawl(
-            save_fpath="{}_p{:03}.html".format(save_fpath_prefix, i), 
+            save_fpath=paginated_crawl_save_fpath(save_fpath_prefix, i), 
             start_dt=t_start_dt,
             currencies=currencies
         ) 
 
+def paginated_crawl_save_fpath(prefix, index):
+    return "{}_p{:03}.html".format(prefix, index)
 
 def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):
-    pass
+    # read marker
+    # get context: `save_fpath_prefix`, `pages`, `first_day_today`
+    
+    if not pathlib.Path(marker_fpath).exists():
+        raise PaginatedParseMarkerNotFound(marker_fpath=marker_fpath)
+    
+    marker = json.load(marker_fpath)
+    
+    # add validations for marker!
+    
+    for pi in range(0, marker['pages']):
+        content = read_saved_result(
+            paginated_crawl_save_fpath(save_fpath_prefix, i)
+        )
+        validate_content(content)
+        currency_values = parse(content, currencies=currencies)
+        
+        # concatenate all in list / DF s !
+        
+        print(currency_values)
 
 
 if __name__ == '__main__':

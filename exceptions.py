@@ -19,3 +19,10 @@ class NotProvidedParameter(BaseException):
         self.parameter_name = parameter_name
         self.message = self.parameter_name + message
         super().__init__(self.message)
+        
+class PaginatedParseMarkerNotFound(BaseException):
+    def __init__(self, marker_fpath=None, message="Marker for Paginated Parsing hadnot been found") -> None:
+        self.marker_fpath = marker_fpath
+        self.message = message
+        self.message += " by ther path: {}".format(marker_fpath)
+        super().__init__(self.message)
