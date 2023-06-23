@@ -195,6 +195,8 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     # add validations for marker!
     
+    results = []
+    
     for pi in range(0, marker['pages']):
         content = read_saved_result(
             paginated_crawl_save_fpath(save_fpath_prefix, i)
@@ -202,9 +204,13 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         validate_content(content)
         currency_values = parse(content, currencies=currencies)
         
-        # concatenate all in list / DF s !
-        
         print(currency_values)
+        
+        # concatenate all in list / DF s !
+        results.append(currency_values)
+    
+    return results
+
 
 
 if __name__ == '__main__':
