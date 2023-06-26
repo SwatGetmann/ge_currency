@@ -6,7 +6,7 @@ import re
 import pathlib
 
 from math import ceil
-from urllib.parse import urlparse, parse_qs, urlencode
+from urllib.parse import urlencode
 
 from exceptions import *
 from validations import *
