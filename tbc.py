@@ -13,12 +13,10 @@ from validations import *
 
 from tbc_tests import *
 
-def basic_request(url, data, headers, save_fpath):
+def basic_request(url, data, headers):
     result = requests.post(url, data=data, headers=headers)  
     print(result.status_code)
     print(result.cookies)
-    with open(save_fpath, "w") as file:
-        file.write(result.text)
     return result
 
 
@@ -76,9 +74,8 @@ def crawl(save_fpath, start_dt, currencies=['USD']):
         url=url,
         data=body,
         headers=headers,
-        save_fpath=save_fpath,
     )
-    
+    save_content(path=save_fpath, content=res.text)
     return res
 
 
@@ -109,11 +106,15 @@ def parse(content, currencies=['USD']):
     return currency_values
 
 
-def read_saved_result(read_fpath):
+def save_content(path, content):
+    with open(path, "w") as file:
+        file.write(content)
+
+
+def read_content(path):
     content = None
-    with open(read_fpath, "r") as file:
+    with open(path, "r") as file:
         content = file.read()
-    
     print(len(content))
     return content
 
@@ -198,7 +199,7 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     results = []
     
     for pi in range(0, marker['pages']):
-        content = read_saved_result(
+        content = read_content(
             paginated_crawl_save_fpath(save_fpath_prefix, i)
         )
         validate_content(content)
