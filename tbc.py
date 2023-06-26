@@ -126,6 +126,8 @@ def marker_content(save_fpath_prefix, pages, first_day_today):
         'first_day_today': first_day_today,
     })
 
+OFFSET_DAYS = 7
+OFFSET_DAYS_FROM_TODAY = 10
 
 def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):    
     if currencies is None or not currencies:
@@ -147,16 +149,16 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     first_day_today = False
     
     if start_dt.date() == datetime.date.today():
-        # first page gives last 7 days already
+        # first page gives last 7 days already (OFFSET_DAYS)
         # next ones should be done with -3 offset
         first_day_today = True
 
     delta_days = ceil((start_dt - end_dt) / datetime.timedelta(days=1))
     
     if first_day_today:
-        pages = 1 + int((delta_days - 10) // 7)
+        pages = 1 + int((delta_days - OFFSET_DAYS_FROM_TODAY) // OFFSET_DAYS)
     else:
-        pages = int(delta_days // 7)
+        pages = int(delta_days // OFFSET_DAYS)
     
     print("Delta Days : {} /// Pages to go back: {}".format(delta_days, pages))
     
@@ -172,9 +174,9 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     t_day_delta = 0
     for i in range(0, pages+1):
-        t_day_delta = 7*i
+        t_day_delta = OFFSET_DAYS * i
         if first_day_today:
-            t_day_delta += (i > 0) * 4
+            t_day_delta += (i > 0) * (OFFSET_DAYS_FROM_TODAY - OFFSET_DAYS + 1)
             
         t_start_dt = start_dt - datetime.timedelta(days=t_day_delta)
         
@@ -221,6 +223,5 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 if __name__ == '__main__':
     print("TBC Test")
 
-    test_4()    
-    # test_5()
-    
+    test_6()
+    test_7()    
