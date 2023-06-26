@@ -87,10 +87,11 @@ def test_7():
     start_dt = datetime.datetime(year=2023, month=5, day=1)
     end_dt = start_dt - datetime.timedelta(days=30)
     
-    paginated_parse(
+    results = paginated_parse(
         save_fpath_prefix='./results/TBC_TEST5_Month', 
         marker_fpath='./markers/TBC_TEST5_Month.marker', 
         start_dt=start_dt,
         end_dt=end_dt, 
         currencies=['USD']
     )
+    print(results)

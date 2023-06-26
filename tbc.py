@@ -13,8 +13,11 @@ from validations import *
 
 from tbc_tests import *
 
-def basic_request(url, data, headers):
-    result = requests.post(url, data=data, headers=headers)  
+def basic_request(url, data, headers, session=None):
+    if session:
+        result = requests.post(url, data=data, headers=headers)
+    else:
+        result = session.post(url, data=data, headers=headers)
     print(result.status_code)
     print(result.cookies)
     return result
@@ -35,7 +38,7 @@ def currency_codes_body_str(currencies):
     return ",".join(["{}:{}".format(i[0], str.lower(str(i[1]))) for i in map.items()])    
 
 
-def crawl(save_fpath, start_dt, currencies=['USD']):
+def crawl(save_fpath, start_dt, currencies=['USD'], session=None):
     url = "https://www.tbcbank.ge/web/en/web/guest/exchange-rates?p_p_id=exchangerates_WAR_tbcpwexchangeratesportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_resource_id=filterChart&p_p_cacheability=cacheLevelPage"
     
     if currencies is None or not currencies:
@@ -70,10 +73,14 @@ def crawl(save_fpath, start_dt, currencies=['USD']):
         "TE": "trailers"
     }
     
+    if session:
+        session.headers = headers
+
     res = basic_request(
         url=url,
         data=body,
         headers=headers,
+        session=session,
     )
     save_content(path=save_fpath, content=res.text)
     return res
@@ -107,12 +114,14 @@ def parse(content, currencies=['USD']):
 
 
 def save_content(path, content):
+    print("Saving: {}...".format(path))
     with open(path, "w") as file:
         file.write(content)
 
 
 def read_content(path):
     content = None
+    print("Reading: {}...".format(path))
     with open(path, "r") as file:
         content = file.read()
     print(len(content))
@@ -126,8 +135,10 @@ def marker_content(save_fpath_prefix, pages, first_day_today):
         'first_day_today': first_day_today,
     })
 
+
 OFFSET_DAYS = 7
 OFFSET_DAYS_FROM_TODAY = 10
+
 
 def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):    
     if currencies is None or not currencies:
@@ -172,6 +183,8 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     print("Marker is written to {}".format(marker_fpath))
     
+    session = requests.Session()
+    
     t_day_delta = 0
     for i in range(0, pages+1):
         t_day_delta = OFFSET_DAYS * i
@@ -185,8 +198,10 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         crawl(
             save_fpath=paginated_crawl_save_fpath(save_fpath_prefix, i), 
             start_dt=t_start_dt,
-            currencies=currencies
+            currencies=currencies,
+            session=session,
         ) 
+
 
 def paginated_crawl_save_fpath(prefix, index):
     return "{}_p{:03}.html".format(prefix, index)
@@ -198,7 +213,7 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     if not pathlib.Path(marker_fpath).exists():
         raise PaginatedParseMarkerNotFound(marker_fpath=marker_fpath)
     
-    marker = json.load(marker_fpath)
+    marker = json.loads(read_content(marker_fpath))
     
     # add validations for marker!
     
@@ -206,7 +221,7 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     for pi in range(0, marker['pages']):
         content = read_content(
-            paginated_crawl_save_fpath(save_fpath_prefix, i)
+            paginated_crawl_save_fpath(save_fpath_prefix, pi)
         )
         validate_content(content)
         currency_values = parse(content, currencies=currencies)
@@ -223,5 +238,5 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 if __name__ == '__main__':
     print("TBC Test")
 
-    test_6()
+    # test_6()
     test_7()    
