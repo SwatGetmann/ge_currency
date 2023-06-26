@@ -119,6 +119,14 @@ def read_content(path):
     return content
 
 
+def marker_content(save_fpath_prefix, pages, first_day_today):
+    return json.dumps({
+        'save_fpath_prefix': save_fpath_prefix,
+        'pages': pages,
+        'first_day_today': first_day_today,
+    })
+
+
 def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):    
     if currencies is None or not currencies:
         raise NotProvidedParameter(parameter_name='currencies')
@@ -155,14 +163,10 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     if not pathlib.Path(marker_fpath).exists():
         pathlib.Path(marker_fpath).parents[0].mkdir(parents=True, exist_ok=True)
     
-    with open(marker_fpath, 'w') as f:
-        f.write(
-            json.dumps({
-                'save_fpath_prefix': save_fpath_prefix,
-                'pages': pages,
-                'first_day_today': first_day_today,
-            })
-        )
+    save_content(
+        path=marker_fpath,
+        content=marker_content(save_fpath_prefix, pages, first_day_today)
+    )
     
     print("Marker is written to {}".format(marker_fpath))
     
