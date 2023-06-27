@@ -86,16 +86,19 @@ def crawl(save_fpath, start_dt, currencies=['USD'], session=None):
     return res
 
 
-def parse(content, currencies=['USD']):
+def parse(content, currencies=['USD'], debug=False):
     match = re.search('\n\s+var chartData = \"(.*)\";', content)
     validate_match(match)
     
-    print(match)
-    print(match.group(1))
+    if debug:
+        print(match)
+        print(match.group(1))
     
     chart_data_text = match.group(1)
     chart_data_text, _ = re.subn('date:', '"date":', chart_data_text)
-    print(chart_data_text)
+    
+    if debug:
+        print(chart_data_text)
     
     for currency in currencies:        
         chart_data_text, _ = re.subn(
@@ -103,12 +106,15 @@ def parse(content, currencies=['USD']):
             '"{}":'.format(currency),
             chart_data_text
         )
-        print(chart_data_text)
+        if debug:
+            print(chart_data_text)
 
     currency_values = eval(chart_data_text)
-    print(currency_values)
-    print(currency_values[0])
-    print(len(currency_values))
+    
+    if debug:
+        print(currency_values)
+        print(currency_values[0])
+        print(len(currency_values))
     
     return currency_values
 
@@ -226,13 +232,14 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         validate_content(content)
         currency_values = parse(content, currencies=currencies)
         
-        print(currency_values)
+        # print(currency_values)
         
         # concatenate all in list / DF s !
         results.append(currency_values)
     
+    results = [item for sublist in results for item in sublist]
+    results.sort(key=lambda x: x['date'])
     return results
-
 
 
 if __name__ == '__main__':
