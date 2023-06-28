@@ -42,7 +42,9 @@ def construct_url(template_url, start, end, currencies):
     return test_url_parsed._replace(query=test_qs).geturl()
 
 
-parser = argparse.ArgumentParser(description='Georgian currency API reader.')
+parser = argparse.ArgumentParser(
+    description='Currency API reader fot NBG (National Bank of Georgia).'
+)
 parser.add_argument('--start_dt', 
                     type=lambda d: datetime.datetime.strptime(d, "%Y-%m-%d"),
                     default=datetime.datetime.now(),
