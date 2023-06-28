@@ -97,15 +97,29 @@ def test_7():
     print(results)
     
 
-def test_8():
+def test_8(name="3Months"):
     # TEST 8 - 3 Months Scope - Crawl
     end_dt = datetime.datetime(year=2023, month=1, day=1)
     start_dt = end_dt - datetime.timedelta(days=90)
     
     paginated_crawl(
-        save_fpath_prefix='./results/TBC_TEST5_3Months', 
-        marker_fpath='./markers/TBC_TEST5_3Months.marker', 
+        save_fpath_prefix='./results/TBC_TEST5_{}'.format(name), 
+        marker_fpath='./markers/TBC_TEST5_{}.marker'.format(name), 
         start_dt=start_dt,
         end_dt=end_dt, 
         currencies=['USD']
     )
+    
+def test_9(name="3Months"):
+    # TEST 8 - 3 Months Scope - Crawl
+    end_dt = datetime.datetime(year=2023, month=1, day=1)
+    start_dt = end_dt - datetime.timedelta(days=90)
+    
+    results = paginated_parse(
+        save_fpath_prefix='./results/TBC_TEST5_{}'.format(name),
+        marker_fpath='./markers/TBC_TEST5_{}.marker'.format(name),
+        start_dt=start_dt,
+        end_dt=end_dt, 
+        currencies=['USD']
+    )
+    print(results)

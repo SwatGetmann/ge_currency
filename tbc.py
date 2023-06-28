@@ -14,9 +14,9 @@ from tbc_tests import *
 
 def basic_request(url, data, headers, session=None):
     if session:
-        result = requests.post(url, data=data, headers=headers)
-    else:
         result = session.post(url, data=data, headers=headers)
+    else:
+        result = requests.post(url, data=data, headers=headers)
     print(result.status_code)
     print(result.cookies)
     return result
@@ -191,7 +191,7 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         if first_day_today:
             t_day_delta += (i > 0) * (OFFSET_DAYS_FROM_TODAY - OFFSET_DAYS + 1)
             
-        t_start_dt = start_dt - datetime.timedelta(days=t_day_delta)
+        t_start_dt = end_dt - datetime.timedelta(days=t_day_delta)
         
         print(t_start_dt)
         
@@ -238,10 +238,11 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         results.append(currency_values)
     
     results = [item for sublist in results for item in sublist]
-    results.sort(key=lambda x: x['date'])
+    results.sort(key=lambda x: datetime.datetime.strptime(x['date'], "%b %d, %Y"))
     return results
 
 
 if __name__ == '__main__':
     print("TBC Test")
     test_8()
+    test_9()
