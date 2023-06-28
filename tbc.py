@@ -10,7 +10,6 @@ from urllib.parse import urlencode
 
 from exceptions import *
 from validations import *
-
 from tbc_tests import *
 
 def basic_request(url, data, headers, session=None):
@@ -225,13 +224,7 @@ def read_marker(path):
 
 
 def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):
-    # read marker
-    # get context: `save_fpath_prefix`, `pages`, `first_day_today`
-    
-    marker = read_marker(marker_fpath)
-    
-    # add validations for marker!
-    
+    marker = read_marker(marker_fpath)    
     results = []
     
     for pi in range(0, marker['pages']):
@@ -251,6 +244,4 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 
 if __name__ == '__main__':
     print("TBC Test")
-
-    # test_6()
-    test_7()    
+    test_8()
