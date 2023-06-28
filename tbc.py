@@ -227,7 +227,7 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     marker = read_marker(marker_fpath)    
     results = []
     
-    for pi in range(0, marker['pages']):
+    for pi in range(0, marker['pages']+1):
         content = read_content(
             paginated_crawl_save_fpath(save_fpath_prefix, pi)
         )
@@ -242,7 +242,54 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     return results
 
 
+parser = argparse.ArgumentParser(
+    description='Currency API reader fot TBC (TBC Bank).'
+)
+parser.add_argument('--start_dt', 
+                    type=lambda d: datetime.datetime.strptime(d, "%Y-%m-%d"),
+                    default=datetime.datetime.now(),
+                    help='a start date for curerncy to be read'
+)
+parser.add_argument('--end_dt', 
+                    type=lambda d: datetime.datetime.strptime(d, "%Y-%m-%d"),  
+                    default=datetime.datetime.now(),
+                    help='an end date for curerncy to be read'
+)
+parser.add_argument('--currencies', 
+                    choices=['USD', 'EUR', 'GBP'],
+                    nargs='+',
+                    required=True,
+                    default='USD',
+                    help='currencies to read'
+)
+parser.add_argument('--save_prefix',
+                    default='TBC_BANK_currency_read',
+                    help='file prefix to store data and markers with'
+)
+
+
 if __name__ == '__main__':
     print("TBC Test")
-    test_8()
-    test_9()
+    
+    args = parser.parse_args()
+    print(args)
+    
+    save_path_prefix = './results/{}'.format(args.save_prefix)
+    marker_path = './markers/{}.marker'.format(args.save_prefix)
+    
+    paginated_crawl(
+        save_fpath_prefix=save_path_prefix, 
+        marker_fpath=marker_path, 
+        start_dt=args.start_dt,
+        end_dt=args.end_dt, 
+        currencies=args.currencies
+    )
+    
+    results = paginated_parse(
+        save_fpath_prefix=save_path_prefix, 
+        marker_fpath=marker_path, 
+        start_dt=args.start_dt,
+        end_dt=args.end_dt, 
+        currencies=args.currencies
+    )
+    print(results)
