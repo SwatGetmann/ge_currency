@@ -165,12 +165,12 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     first_day_today = False
     
-    if start_dt.date() == datetime.date.today():
+    if end_dt.date() == datetime.date.today():
         # first page gives last 7 days already (OFFSET_DAYS)
         # next ones should be done with -3 offset
         first_day_today = True
 
-    delta_days = ceil((start_dt - end_dt) / datetime.timedelta(days=1))
+    delta_days = ceil((end_dt - start_dt) / datetime.timedelta(days=1))
     
     if first_day_today:
         pages = 1 + int((delta_days - OFFSET_DAYS_FROM_TODAY) // OFFSET_DAYS)
