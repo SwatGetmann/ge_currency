@@ -58,8 +58,8 @@ def test_4():
 
 def test_5():
     # TEST 5 - Paginated crawl - Last 1 Week
-    start_dt = datetime.datetime.now()
-    end_dt = start_dt - datetime.timedelta(days=25)
+    end_dt = datetime.datetime.now()
+    start_dt = end_dt - datetime.timedelta(days=25)
     
     paginated_crawl(
         save_fpath_prefix='./results/TBC_TEST5_LastWeek', 
@@ -71,8 +71,8 @@ def test_5():
 
 def test_6():
     # TEST 6 - Paginated crawl - Arbitrary Dates
-    start_dt = datetime.datetime(year=2023, month=5, day=1)
-    end_dt = start_dt - datetime.timedelta(days=30)
+    end_dt = datetime.datetime(year=2023, month=5, day=1)
+    start_dt = end_dt - datetime.timedelta(days=30)
     
     paginated_crawl(
         save_fpath_prefix='./results/TBC_TEST5_Month', 
@@ -84,8 +84,8 @@ def test_6():
     
 def test_7():
     # TEST 7 - Paginated parse - Arbitrary Dates
-    start_dt = datetime.datetime(year=2023, month=5, day=1)
-    end_dt = start_dt - datetime.timedelta(days=30)
+    end_dt = datetime.datetime(year=2023, month=5, day=1)
+    start_dt = end_dt - datetime.timedelta(days=30)
     
     results = paginated_parse(
         save_fpath_prefix='./results/TBC_TEST5_Month', 
@@ -95,3 +95,17 @@ def test_7():
         currencies=['USD']
     )
     print(results)
+    
+
+def test_8():
+    # TEST 8 - 3 Months Scope - Crawl
+    end_dt = datetime.datetime(year=2023, month=1, day=1)
+    start_dt = end_dt - datetime.timedelta(days=90)
+    
+    paginated_crawl(
+        save_fpath_prefix='./results/TBC_TEST5_3Months', 
+        marker_fpath='./markers/TBC_TEST5_3Months.marker', 
+        start_dt=start_dt,
+        end_dt=end_dt, 
+        currencies=['USD']
+    )
