@@ -151,10 +151,10 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         raise NotProvidedParameter(parameter_name='currencies')
     
     if not start_dt:
-        raise NotProvidedParameter(parameter_name='Start DT || chartCalendarValue')
+        raise NotProvidedParameter(parameter_name='Start DT (Paginated Crawl)')
     
     if not end_dt:
-        raise NotProvidedParameter(parameter_name='End DT')
+        raise NotProvidedParameter(parameter_name='End DT (Paginated Crawl)')
     
     print("Paginated crawl for {} - {}".format(end_dt, start_dt))
     
@@ -179,15 +179,10 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     
     print("Delta Days : {} /// Pages to go back: {}".format(delta_days, pages))
     
-    if not pathlib.Path(marker_fpath).exists():
-        pathlib.Path(marker_fpath).parents[0].mkdir(parents=True, exist_ok=True)
-    
-    save_content(
-        path=marker_fpath,
+    save_marker(
+        path=marker_fpath, 
         content=marker_content(save_fpath_prefix, pages, first_day_today)
     )
-    
-    print("Marker is written to {}".format(marker_fpath))
     
     session = requests.Session()
     
@@ -212,14 +207,28 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 def paginated_crawl_save_fpath(prefix, index):
     return "{}_p{:03}.html".format(prefix, index)
 
+
+def save_marker(path, content):
+    if not pathlib.Path(path).exists():
+        pathlib.Path(path).parents[0].mkdir(parents=True, exist_ok=True)
+    save_content(
+        path=path,
+        content=content
+    )
+    print("Marker is written to {}".format(path))
+
+
+def read_marker(path):
+    if not pathlib.Path(path).exists():
+        raise PaginatedParseMarkerNotFound(marker_fpath=path)
+    return json.loads(read_content(path))
+
+
 def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):
     # read marker
     # get context: `save_fpath_prefix`, `pages`, `first_day_today`
     
-    if not pathlib.Path(marker_fpath).exists():
-        raise PaginatedParseMarkerNotFound(marker_fpath=marker_fpath)
-    
-    marker = json.loads(read_content(marker_fpath))
+    marker = read_marker(marker_fpath)
     
     # add validations for marker!
     
@@ -231,9 +240,7 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
         )
         validate_content(content)
         currency_values = parse(content, currencies=currencies)
-        
-        # print(currency_values)
-        
+                
         # concatenate all in list / DF s !
         results.append(currency_values)
     
