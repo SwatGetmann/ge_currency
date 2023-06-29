@@ -55,7 +55,7 @@ parser.add_argument('--end_dt',
                     default=datetime.datetime.now(),
                     help='an end date for curerncy to be read'
 )
-parser.add_argument('--currency', 
+parser.add_argument('--currencies', 
                     choices=['USD', 'EUR', 'GBP'],
                     default='USD',
                     nargs='+',
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         template_url=test_url,
         start=args.start_dt.strftime('%F'),
         end=args.end_dt.strftime('%F'),
-        currencies=args.currency
+        currencies=args.currencies
     )
     
     headers = {
