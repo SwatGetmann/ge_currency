@@ -58,6 +58,8 @@ parser.add_argument('--end_dt',
 parser.add_argument('--currency', 
                     choices=['USD', 'EUR', 'GBP'],
                     default='USD',
+                    nargs='+',
+                    required=True,
                     help='currency to select'
 )
 
@@ -70,7 +72,7 @@ if __name__ == '__main__':
     
     test_url = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/?currencies=USD&currencies=USD&end=2023-06-13T04%3A37%3A39.818Z&start=2023-05-24T04%3A37%3A39.818Z"
     
-    test_url_v2 = construct_url(
+    curr_test_url = construct_url(
         template_url=test_url,
         start=args.start_dt.strftime('%F'),
         end=args.end_dt.strftime('%F'),
@@ -90,21 +92,10 @@ if __name__ == '__main__':
     }
     
     result = basic_request(
-        url=test_url_v2,
+        url=curr_test_url,
         headers=headers,
     )
     save_content(
         path='./results/test_01.json', 
-        content=json.dumps(result.json())
-    )
-    
-    test_url = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/?currencies=USD&currencies=USD&end=2023-06-13T04%3A37%3A39.818Z&start=2023-05-24T04%3A37%3A39.818Z"
-    
-    result = basic_request(
-        url=test_url,
-        headers=headers,
-    )
-    save_content(
-        path='./results/test_02.json',
         content=json.dumps(result.json())
     )
