@@ -2,8 +2,11 @@ import argparse
 import datetime
 import requests
 import json
+import pandas as pd
 
 from urllib.parse import urlparse, parse_qs, urlencode
+
+from util import *
 
 def basic_request(url, headers):
     result = requests.get(url, headers=headers)  
@@ -11,12 +14,6 @@ def basic_request(url, headers):
     print(result.json())
     print(result.cookies)
     return result 
-
-
-def save_content(path, content):
-    with open(path, "w") as file:
-        file.write(content)
-
 
 def construct_url(template_url, start, end, currencies):
     test_url_parsed = urlparse(template_url)
@@ -106,3 +103,8 @@ if __name__ == '__main__':
         path=save_path,
         content=json.dumps(result.json())
     )
+    
+    df = pd.DataFrame(result)
+    parquet_path = './parquets/{}.parquet'.format(args.save_prefix)
+    save_parquet(path=parquet_path, df=df)
+    

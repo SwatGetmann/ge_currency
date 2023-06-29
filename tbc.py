@@ -10,9 +10,11 @@ import pandas as pd
 from math import ceil
 from urllib.parse import urlencode
 
+from util import *
 from exceptions import *
 from validations import *
 from tbc_tests import *
+
 
 def basic_request(url, data, headers, session=None):
     if session:
@@ -120,21 +122,6 @@ def parse(content, currencies=['USD'], debug=False):
     return currency_values
 
 
-def save_content(path, content):
-    print("Saving: {}...".format(path))
-    with open(path, "w") as file:
-        file.write(content)
-
-
-def read_content(path):
-    content = None
-    print("Reading: {}...".format(path))
-    with open(path, "r") as file:
-        content = file.read()
-    print(len(content))
-    return content
-
-
 def marker_content(save_fpath_prefix, pages, first_day_today):
     return json.dumps({
         'save_fpath_prefix': save_fpath_prefix,
@@ -207,29 +194,6 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
 
 def paginated_crawl_save_fpath(prefix, index):
     return "{}_p{:03}.html".format(prefix, index)
-
-
-def save_marker(path, content):
-    if not pathlib.Path(path).exists():
-        pathlib.Path(path).parents[0].mkdir(parents=True, exist_ok=True)
-    save_content(
-        path=path,
-        content=content
-    )
-    print("Marker is written to {}".format(path))
-
-
-def save_parquet(path, df: pd.DataFrame):
-    if not pathlib.Path(path).exists():
-        pathlib.Path(path).parents[0].mkdir(parents=True, exist_ok=True)
-    df.to_parquet(path=path, engine='pyarrow')
-    print("Parquet is written to {}".format(path))
-
-
-def read_marker(path):
-    if not pathlib.Path(path).exists():
-        raise PaginatedParseMarkerNotFound(marker_fpath=path)
-    return json.loads(read_content(path))
 
 
 def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencies=['USD']):
