@@ -62,6 +62,10 @@ parser.add_argument('--currencies',
                     required=True,
                     help='currency to select'
 )
+parser.add_argument('--save_prefix',
+                    default='NBG_currency_read',
+                    help='file prefix to store data and markers with'
+)
 
 
 if __name__ == '__main__':
@@ -95,7 +99,10 @@ if __name__ == '__main__':
         url=curr_test_url,
         headers=headers,
     )
+    
+    save_path = './results/{}.json'.format(args.save_prefix)
+    
     save_content(
-        path='./results/test_01.json', 
+        path=save_path,
         content=json.dumps(result.json())
     )
