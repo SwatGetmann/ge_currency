@@ -5,6 +5,8 @@ import json
 import re
 import pathlib
 
+import pandas as pd
+
 from math import ceil
 from urllib.parse import urlencode
 
@@ -155,7 +157,7 @@ def paginated_crawl(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     if not end_dt:
         raise NotProvidedParameter(parameter_name='End DT (Paginated Crawl)')
     
-    print("Paginated crawl for {} - {}".format(end_dt, start_dt))
+    print("Paginated crawl for {} - {}".format(start_dt, end_dt))
     
     # precalulcate how many requests are necessary
     # we know that TBC gives the desired date in the middle of response list
@@ -215,6 +217,13 @@ def save_marker(path, content):
         content=content
     )
     print("Marker is written to {}".format(path))
+
+
+def save_parquet(path, df: pd.DataFrame):
+    if not pathlib.Path(path).exists():
+        pathlib.Path(path).parents[0].mkdir(parents=True, exist_ok=True)
+    df.to_parquet(path=path, engine='pyarrow')
+    print("Parquet is written to {}".format(path))
 
 
 def read_marker(path):
@@ -293,3 +302,8 @@ if __name__ == '__main__':
         currencies=args.currencies
     )
     print(results)
+    
+    df = pd.DataFrame(results)
+    parquet_path = './parquets/{}.parquet'.format(args.save_prefix)
+    save_parquet(path=parquet_path, df=df)
+    

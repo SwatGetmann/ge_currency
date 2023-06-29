@@ -15,7 +15,7 @@ An app, that daily tracks currencies in Georgia, starting with Lari(GEL) and US 
 * Support for EUR, USD
     * [+] TBC
     * [+] nbg.gov.ge
-* Save API results as pandas datasets into parquets 
+* Save API results as pandas datasets into parquets [+, TBC Only]
 * Compare TBC & National Bank rates
 * Read Other Currency Rate APIs 
     * Liberty Bank
