@@ -75,7 +75,7 @@ def crawl(save_fpath_prefix, start_dt, end_dt, currencies=['USD'], session=None)
         )
         
         df = pd.DataFrame(result)
-        parquet_path = save_fpath_generator('parquet', save_fpath_prefix, currency),
+        parquet_path = save_fpath_generator('parquet', save_fpath_prefix, currency)
         save_parquet(path=parquet_path, df=df)
 
 
@@ -84,9 +84,9 @@ def save_fpath_generator(ftype=None, prefix=None, currency=None):
         raise NotProvidedParameter(parameter_name='ftype')
     
     if ftype == 'json':
-        return './results/{}_{}.json'.format(prefix, currency)
+        return "./results/{}_{}.json".format(prefix, currency)
     elif ftype == 'parquet':
-        return './parquets/{}_{}.parquet'.format(prefix, currency)
+        return "./parquets/{}_{}.parquet".format(prefix, currency)
     else:
         raise UnsupportedValueParameter(parameter_name='ftype')
 
