@@ -19,6 +19,12 @@ class NotProvidedParameter(BaseException):
         self.parameter_name = parameter_name
         self.message = self.parameter_name + message
         super().__init__(self.message)
+
+class UnsupportedValueParameter(BaseException):
+    def __init__(self, parameter_name='ParameterName', message=" value is unsupported!") -> None:
+        self.parameter_name = parameter_name
+        self.message = self.parameter_name + message
+        super().__init__(self.message)
         
 class PaginatedParseMarkerNotFound(BaseException):
     def __init__(self, path=None, message="Marker for Paginated Parsing had not been found") -> None:
