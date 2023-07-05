@@ -74,7 +74,7 @@ def crawl(save_fpath_prefix, start_dt, end_dt, currencies=['USD'], session=None)
             content=json.dumps(result.json())
         )
         
-        df = pd.DataFrame(result)
+        df = pd.DataFrame(result.json())
         parquet_path = save_fpath_generator('parquet', save_fpath_prefix, currency)
         save_parquet(path=parquet_path, df=df)
 
