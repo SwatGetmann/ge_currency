@@ -261,7 +261,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
     
-    save_path_prefix = save_fpath_generator(ftype='result_prefix', prefix=args.save_prefix)
+    save_path_prefix = save_fpath_generator(ftype='results_prefix', prefix=args.save_prefix)
     marker_path = save_fpath_generator(ftype='marker', prefix=args.save_prefix)
     
     paginated_crawl(
