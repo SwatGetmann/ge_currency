@@ -7,16 +7,18 @@ An app, that daily tracks currencies in Georgia, starting with Lari(GEL) and US 
 ## Plans
 
 * [+] Read TBC bank API
-* Paginate APIs
-    * paginated crawling [+, TBC only]
-    * paginated parsing [+, TBC only]
-        * store all together
-    * run within the same session [+, TBC only]
-* Support for EUR, USD
+* [+] Paginate APIs
+    * [+, Necessary only for TBC] paginated crawling, session-safe
+    * [+] paginated parsing
+* [+] Support for EUR, USD, GBP
     * [+] TBC
     * [+] nbg.gov.ge
-* Save API results as pandas datasets into parquets [+, TBC Only]
-* Compare TBC & National Bank rates
+* [+] Parquets save for API results
+* [+] CLI for Crawling & Parsing APIs
+* [+-] Unit Tests
+    * should be rewritten account to test methodologies
+* [+] Add Jupyter Notebooks for test/example purposes
+* Compare TBC & National Bank (NBG) rates
 * Read Other Currency Rate APIs 
     * Liberty Bank
     * BOG
