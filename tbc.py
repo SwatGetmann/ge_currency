@@ -215,6 +215,20 @@ def paginated_parse(save_fpath_prefix, marker_fpath, start_dt, end_dt, currencie
     return results
 
 
+def save_fpath_generator(ftype=None, prefix=None):
+    if not ftype:
+        raise NotProvidedParameter(parameter_name='ftype')
+    
+    if ftype == 'results_prefix':
+        return "./results/{}".format(prefix)
+    elif ftype == 'parquet':
+        return "./parquets/{}.parquet".format(prefix)
+    elif ftype == 'marker':
+        return "./markers/{}.marker".format(prefix)
+    else:
+        raise UnsupportedValueParameter(parameter_name='ftype')
+
+
 parser = argparse.ArgumentParser(
     description='Currency API reader fot TBC (TBC Bank).'
 )
@@ -247,8 +261,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
     
-    save_path_prefix = './results/{}'.format(args.save_prefix)
-    marker_path = './markers/{}.marker'.format(args.save_prefix)
+    save_path_prefix = save_fpath_generator(ftype='result_prefix', prefix=args.save_prefix)
+    marker_path = save_fpath_generator(ftype='marker', prefix=args.save_prefix)
     
     paginated_crawl(
         save_fpath_prefix=save_path_prefix, 
@@ -268,6 +282,6 @@ if __name__ == '__main__':
     print(results)
     
     df = pd.DataFrame(results)
-    parquet_path = './parquets/{}.parquet'.format(args.save_prefix)
+    parquet_path = save_fpath_generator(ftype='parquet', prefix=args.save_prefix)
     save_parquet(path=parquet_path, df=df)
     
