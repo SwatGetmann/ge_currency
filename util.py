@@ -34,11 +34,15 @@ def save_parquet(path, df: pd.DataFrame):
     print("Parquet is written to {}".format(path))
 
 
-def save_content(path, content):
+def save_content(path, content, bytes=False):
     if not pathlib.Path(path).exists():
         pathlib.Path(path).parents[0].mkdir(parents=True, exist_ok=True)
     print("Saving: {}...".format(path))
-    with open(path, "w") as file:
+    if bytes:
+        marker = "wb"
+    else:
+        marker = "w"
+    with open(path, marker) as file:
         file.write(content)
     print("Content is saved to {}".format(path))
 
