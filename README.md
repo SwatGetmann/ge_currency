@@ -28,3 +28,4 @@ An app, that daily tracks currencies in Georgia, starting with Lari(GEL) and US 
 * Read Other Currency Rate APIs 
     * Liberty Bank
     * BOG
+    * RICO
