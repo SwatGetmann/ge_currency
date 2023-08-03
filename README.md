@@ -29,3 +29,5 @@ An app, that daily tracks currencies in Georgia, starting with Lari(GEL) and US 
     * Liberty Bank
     * BOG
     * RICO
+* Parallaelize requests
+* Make global API
