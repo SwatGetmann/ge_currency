@@ -59,8 +59,8 @@ def crawl(save_fpath_prefix, start_dt, end_dt, currencies=['USD'], session=None)
     for currency in currencies:
         curr_test_url = construct_url(
             template_url=url,
-            start=start_dt,
-            end=end_dt,
+            start=start_dt.strftime('%F'),
+            end=end_dt.strftime('%F'),
             currencies=currency
         )
         
@@ -123,8 +123,8 @@ if __name__ == '__main__':
     
     crawl(
         save_fpath_prefix=args.save_prefix, 
-        start_dt=args.start_dt.strftime('%F'),
-        end_dt=args.end_dt.strftime('%F'),
+        start_dt=args.start_dt,
+        end_dt=args.end_dt,
         currencies=args.currencies, 
         session=None
     )
