@@ -19,6 +19,12 @@ An app, that daily tracks currencies in Georgia, starting with Lari(GEL) and US 
     * should be rewritten account to test methodologies
 * [+] Add Jupyter Notebooks for test/example purposes
 * Compare TBC & National Bank (NBG) rates
+    * Acquire the data for the last year (2023)
+    * Compare daily deltas
+    * Plot results out
+* Cache results
+    * Reuse already scraped data
+* Store the data in local sqlite if required
 * Read Other Currency Rate APIs 
     * Liberty Bank
     * BOG
